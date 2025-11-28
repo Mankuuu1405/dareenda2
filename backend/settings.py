@@ -20,22 +20,14 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 # --- OPENAI API KEY (ADDED HERE) ---
 OPENAI_API_KEY = config("OPENAI_API_KEY", default=None) 
 
-# --- ALLOWED HOSTS (UPDATED FOR PRODUCTION/VERCEL) ---
-ALLOWED_HOSTS = [
-    'your-production-backend.com',    # <-- REPLACE: Tumhare live Django server ka domain
-    '127.0.0.1',
-    'localhost',
-    '.vercel.app',                   # <-- ALLOWS: Vercel frontend access (e.g., xpertai-global.vercel.app)
-]
+# --- ALLOWED HOSTS ---
+ALLOWED_HOSTS = ["*"]
 
 # -----------------------------
 # INSTALLED APPS
 # -----------------------------
 INSTALLED_APPS = [
     'jazzmin',  # <--- JAZZMIN Added at the TOP
-
-    # 'admin_interface', # <--- Commented out to avoid conflict
-    # 'colorfield',      # <--- Commented out to avoid conflict
 
     'django.contrib.admin',
     "django.contrib.auth",
@@ -149,12 +141,22 @@ REST_FRAMEWORK = {
 }
 
 # -----------------------------
-# CORS SETTINGS
+# CORS & CSRF SETTINGS (CRITICAL FOR CHATBOT)
 # -----------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://xpertai-global.vercel.app", # <--- Example: Deploy link
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+# --- 🚨 THIS IS THE FIX FOR 403 ERROR ---
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://xpertai-global.vercel.app",
+]
 
 # -----------------------------
 # DEFAULT PRIMARY KEY
@@ -173,7 +175,6 @@ now_utc = datetime.datetime.utcnow()
 now_ist = now_utc + IST_OFFSET
 
 # 2. Determine if it is day time (6 AM to 6 PM IST)
-# Note: Hours are compared in 24-hour format (6=6AM, 18=6PM)
 is_daytime = 6 <= now_ist.hour < 18
 
 if is_daytime:
